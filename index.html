@@ -3,18 +3,25 @@
 
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#6467f2">
+
+    <meta name="description" content="Recall — приложение для интервального повторения конспектов">
 
     <title>Recall — интервальное повторение</title>
 
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0a0d14">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Recall">
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <!-- PWA -->
+    <link rel="manifest" href="./manifest.json">
 
-    <link rel="stylesheet" href="recall.css">
+    <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="./recall.css">
+
+    <!-- JS -->
+    <script src="./recall.js" defer></script>
 </head>
 
 
@@ -22,48 +29,46 @@
 
     <div class="app">
 
-        <!-- =========================
-         HEADER
-    ========================== -->
+        <!-- HEADER -->
 
         <header>
 
             <div class="logo">
 
-                <div class="logo-icon">R</div>
+                <div class="logo-icon">
+                    R
+                </div>
 
                 <div>
                     <h1>Recall</h1>
-                    <p>Учись меньше. Помни дольше.</p>
+
+                    <p>
+                        Твой конспект не должен забываться
+                    </p>
                 </div>
 
             </div>
 
 
-            <div class="header-controls">
+            <nav>
 
-                <nav>
-
-                    <button class="nav-btn active" data-page="dashboard">
-                        Главная
-                    </button>
-
-                    <button class="nav-btn" data-page="review">
-                        Повторять
-                    </button>
-
-                    <button class="nav-btn" data-page="cards">
-                        Материалы
-                    </button>
-
-                </nav>
-
-                <button class="notif-btn" id="notifBtn" onclick="toggleNotifications()" title="Напоминания о повторениях">
-                    <span class="notif-bell" id="notifBell">🔔</span>
-                    <span class="notif-label" id="notifLabel">Напоминания</span>
+                <button class="nav-btn active" data-page="dashboard">
+                    Главная
                 </button>
 
-            </div>
+                <button class="nav-btn" data-page="review">
+                    Повторить
+                </button>
+
+                <button class="nav-btn" data-page="schedule">
+                    Расписание
+                </button>
+
+                <button class="nav-btn" data-page="cards">
+                    Материалы
+                </button>
+
+            </nav>
 
         </header>
 
@@ -78,16 +83,18 @@
             <div class="hero">
 
                 <h2 id="greeting">
-                    Доброе утро 👋
+                    Добрый день 👋
                 </h2>
 
                 <p>
-                    Сегодня достаточно нескольких минут,
-                    чтобы не забыть изученное.
+                    Добавляй темы из тетради —
+                    Recall сам напомнит, когда их повторить.
                 </p>
 
             </div>
 
+
+            <!-- STATS -->
 
             <div class="stats">
 
@@ -119,7 +126,7 @@
                     </div>
 
                     <div class="stat-small">
-                        материалов
+                        тем
                     </div>
 
                 </div>
@@ -145,7 +152,7 @@
                 <div class="stat">
 
                     <div class="stat-label">
-                        📚 Изучается
+                        📚 Материалов
                     </div>
 
                     <div class="stat-value" id="cardsValue">
@@ -153,7 +160,7 @@
                     </div>
 
                     <div class="stat-small">
-                        материалов
+                        сохранено
                     </div>
 
                 </div>
@@ -171,29 +178,32 @@
                     <div>
 
                         <h3>
-                            План на сегодня
+                            Сегодня
                         </h3>
 
                         <p id="todayDescription">
-                            Загружаем очередь...
                         </p>
 
                     </div>
 
 
-                    <button class="button" onclick="openReview()">
+                    <button class="button" id="startReviewButton">
                         Начать →
                     </button>
 
                 </div>
 
 
-                <div class="progress-wrapper">
+                <div id="todayList" class="today-list">
+                </div>
+
+
+                <div class="progress-section">
 
                     <div class="progress-info">
 
                         <span>
-                            Сегодня
+                            Дневной прогресс
                         </span>
 
                         <span id="progressText">
@@ -202,50 +212,10 @@
 
                     </div>
 
+
                     <div class="progress-bar">
 
                         <div class="progress-fill" id="dailyProgress">
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- LEVEL -->
-
-            <div class="panel">
-
-                <div class="level-line">
-
-                    <div>
-
-                        <div class="stat-label">
-                            Твой уровень
-                        </div>
-
-                        <div class="level-number" id="levelValue">
-                            Level 1
-                        </div>
-
-                    </div>
-
-
-                    <div id="levelXP">
-                        0 / 100 XP
-                    </div>
-
-                </div>
-
-
-                <div class="progress-wrapper">
-
-                    <div class="progress-bar">
-
-                        <div class="progress-fill" id="levelProgress">
                         </div>
 
                     </div>
@@ -265,12 +235,11 @@
                     <div>
 
                         <h3>
-                            Добавить материал
+                            + Добавить конспект
                         </h3>
 
                         <p>
-                            Создай вопрос, который заставит тебя
-                            вспомнить информацию.
+                            Добавь тему из своей тетради.
                         </p>
 
                     </div>
@@ -278,46 +247,103 @@
                 </div>
 
 
-                <form class="form-grid" id="addCardForm">
+                <form id="addCardForm" class="form-grid">
 
-                    <div>
+                    <div class="form-row">
 
-                        <label>
-                            Тема
-                        </label>
+                        <div>
 
-                        <input id="topicInput" placeholder="Например: English" list="topicsList" required>
-                        <datalist id="topicsList"></datalist>
+                            <label for="subjectInput">
+                                Предмет
+                            </label>
 
-                    </div>
+                            <input id="subjectInput" placeholder="Physics" required>
 
-
-                    <div>
-
-                        <label>
-                            Вопрос
-                        </label>
-
-                        <textarea id="questionInput" placeholder="Когда используется Present Perfect?"
-                            required></textarea>
-
-                    </div>
+                        </div>
 
 
-                    <div>
+                        <div>
 
-                        <label>
-                            Ответ
-                        </label>
+                            <label for="titleInput">
+                                Название темы
+                            </label>
 
-                        <textarea id="answerInput" placeholder="Для действий, которые связаны с настоящим..."
-                            required></textarea>
+                            <input id="titleInput" placeholder="Lenses" required>
+
+                        </div>
 
                     </div>
 
 
-                    <button class="button" type="submit">
-                        + Добавить
+
+                    <div class="form-row">
+
+                        <div>
+
+                            <label for="pageInput">
+
+                                Страница в тетради
+
+                                <span class="optional">
+                                    — необязательно
+                                </span>
+
+                            </label>
+
+                            <input id="pageInput" placeholder="34">
+
+                        </div>
+
+
+                        <div>
+
+                            <label for="examInput">
+
+                                Дата экзамена
+
+                                <span class="optional">
+                                    — необязательно
+                                </span>
+
+                            </label>
+
+                            <input id="examInput" type="date">
+
+                            <div class="helper">
+                                Если экзамена нет — оставь пустым.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div>
+
+                        <label for="questionInput">
+                            Вопрос для себя
+                        </label>
+
+                        <textarea id="questionInput" placeholder="Как работают собирающие линзы?" required></textarea>
+
+                    </div>
+
+
+
+                    <div>
+
+                        <label for="answerInput">
+                            Короткий ответ
+                        </label>
+
+                        <textarea id="answerInput" placeholder="Собирающая линза..." required></textarea>
+
+                    </div>
+
+
+                    <button type="submit" class="button">
+                        Добавить материал
                     </button>
 
                 </form>
@@ -329,14 +355,14 @@
 
 
         <!-- =========================
-         REVIEW PAGE
+         REVIEW
     ========================== -->
 
         <section id="review" class="page">
 
             <div class="review-container">
 
-                <div class="review-status" id="reviewStatus">
+                <div id="reviewStatus" class="review-status">
                 </div>
 
 
@@ -349,12 +375,12 @@
                         </div>
 
                         <h3>
-                            Пока нечего повторять
+                            Повторения
                         </h3>
 
                         <p>
-                            Добавь материал или возвращайся,
-                            когда наступит следующее повторение.
+                            Здесь появятся темы,
+                            которые пора повторить.
                         </p>
 
                     </div>
@@ -368,7 +394,41 @@
 
 
         <!-- =========================
-         CARDS PAGE
+         SCHEDULE
+    ========================== -->
+
+        <section id="schedule" class="page">
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h3>
+                            Ближайшие повторения
+                        </h3>
+
+                        <p>
+                            План на следующие 14 дней
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div id="upcomingList" class="upcoming-list">
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+         MATERIALS
     ========================== -->
 
         <section id="cards" class="page">
@@ -392,7 +452,20 @@
                 </div>
 
 
-                <div class="cards-list" id="cardsList">
+                <div class="toolbar">
+
+                    <select id="subjectFilter">
+
+                        <option value="">
+                            Все темы
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div id="cardsList" class="cards-list">
                 </div>
 
             </div>
@@ -400,10 +473,6 @@
         </section>
 
     </div>
-
-
-
-    <script src="recall.js"></script>
 
 </body>
 
