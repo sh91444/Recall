@@ -93,6 +93,126 @@
 
             </div>
 
+            <!-- =========================
+            AI GENERATOR
+        ========================== -->
+
+            <div class="panel ai-panel">
+
+                <div class="panel-header">
+                    <div>
+            <h3>✨ AI-карточки</h3>
+
+            <p>
+                Вставь конспект — AI создаст 5 вопросов для повторения.
+            </p>
+        </div>
+    </div>
+
+
+    <div class="form-grid">
+
+        <div class="form-row">
+
+            <div>
+                <label for="aiSubjectInput">
+                    Предмет
+                </label>
+
+                <input
+                    id="aiSubjectInput"
+                    placeholder="English"
+                >
+            </div>
+
+
+            <div>
+                <label for="aiTitleInput">
+                    Тема
+                </label>
+
+                <input
+                    id="aiTitleInput"
+                    placeholder="Present Perfect"
+                >
+            </div>
+
+        </div>
+
+
+        <div class="form-row">
+
+            <div>
+                <label for="aiPageInput">
+                    Страница
+                    <span class="optional">
+                        — необязательно
+                    </span>
+                </label>
+
+                <input
+                    id="aiPageInput"
+                    placeholder="42"
+                >
+            </div>
+
+
+            <div>
+                <label for="aiExamInput">
+                    Экзамен
+                    <span class="optional">
+                        — необязательно
+                    </span>
+                </label>
+
+                <input
+                    id="aiExamInput"
+                    type="date"
+                >
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <label for="aiNotesInput">
+                Конспект
+            </label>
+
+            <textarea
+                id="aiNotesInput"
+                class="ai-notes"
+                placeholder="Вставь сюда текст своего конспекта..."
+            ></textarea>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="button"
+            id="generateAICardsButton"
+        >
+            ✨ Создать 5 карточек
+        </button>
+
+
+        <div
+            id="aiStatus"
+            class="ai-status"
+        ></div>
+
+
+        <div
+            id="aiCardsPreview"
+            class="ai-preview"
+        ></div>
+
+    </div>
+
+</div>
+
 
             <!-- STATS -->
 
