@@ -1,4 +1,4 @@
-﻿/* =========================================================
+/* =========================================================
    RECALL DATA
 ========================================================= */
 
@@ -30,7 +30,15 @@ let reviewQueue = [];
 
 let currentCard = null;
 
+/* =========================================================
+   AI CONFIG
+========================================================= */
 
+const AI_API_URL =
+    "https://recall-ai-api.sho591820.workers.dev/";
+
+
+let generatedAICards = [];
 
 /* =========================================================
    STORAGE
@@ -1201,7 +1209,7 @@ function adjustForExam(
 ) {
 
     /*
-        Нет экзамена -
+        Нет экзамена —
         ничего не меняем.
     */
 
@@ -1755,7 +1763,7 @@ function renderUpcoming() {
                                 )
                                     }
 
-                                                    -
+                                                    —
 
                                                     ${escapeHTML(
                                         card.title
@@ -2575,7 +2583,512 @@ if (
 
 }
 
+/* =========================================================
+   AI GENERATOR
+========================================================= */
 
+const generateAICardsButton =
+    document.getElementById(
+        "generateAICardsButton"
+    );
+
+
+if (generateAICardsButton) {
+
+    generateAICardsButton.addEventListener(
+        "click",
+        generateAICards
+    );
+
+}
+
+
+
+async function generateAICards() {
+
+    const notes =
+        document
+            .getElementById(
+                "aiNotesInput"
+            )
+            .value
+            .trim();
+
+
+    const status =
+        document.getElementById(
+            "aiStatus"
+        );
+
+
+    const preview =
+        document.getElementById(
+            "aiCardsPreview"
+        );
+
+
+    if (notes.length < 30) {
+
+        status.className =
+            "ai-status error";
+
+
+        status.textContent =
+            "Конспект слишком короткий.";
+
+        return;
+
+    }
+
+
+    if (notes.length > 12000) {
+
+        status.className =
+            "ai-status error";
+
+
+        status.textContent =
+            "Конспект слишком большой. Раздели его на части.";
+
+        return;
+
+    }
+
+
+    status.className =
+        "ai-status loading";
+
+
+    status.textContent =
+        "✨ AI создаёт карточки...";
+
+
+    preview.innerHTML = "";
+
+
+    generateAICardsButton.disabled =
+        true;
+
+
+    generateAICardsButton.textContent =
+        "Создаю...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                AI_API_URL,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            notes
+                        })
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.error ||
+                "AI error"
+            );
+
+        }
+
+
+        if (
+            !Array.isArray(
+                result.cards
+            )
+        ) {
+
+            throw new Error(
+                "AI вернул неправильный формат."
+            );
+
+        }
+
+
+        generatedAICards =
+            result.cards
+                .filter(card => {
+
+                    return (
+                        typeof card.question ===
+                        "string" &&
+                        typeof card.answer ===
+                        "string"
+                    );
+
+                })
+                .slice(0, 5);
+
+
+        status.className =
+            "ai-status success";
+
+
+        status.textContent =
+            `✓ Создано ${generatedAICards.length} карточек`;
+
+
+        renderAICardsPreview();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "AI:",
+            error
+        );
+
+
+        status.className =
+            "ai-status error";
+
+
+        status.textContent =
+            "Не удалось создать карточки. Попробуй ещё раз.";
+
+    }
+
+    finally {
+
+        generateAICardsButton.disabled =
+            false;
+
+
+        generateAICardsButton.textContent =
+            "✨ Создать 5 карточек";
+
+    }
+
+}
+
+
+
+/* =========================================================
+   AI PREVIEW
+========================================================= */
+
+function renderAICardsPreview() {
+
+    const container =
+        document.getElementById(
+            "aiCardsPreview"
+        );
+
+
+    if (
+        generatedAICards.length === 0
+    ) {
+
+        container.innerHTML = "";
+
+        return;
+
+    }
+
+
+    container.innerHTML = `
+
+        ${
+            generatedAICards
+                .map(
+                    (card, index) => {
+
+                        return `
+
+                            <div class="ai-generated-card">
+
+                                <div class="ai-generated-number">
+
+                                    КАРТОЧКА ${index + 1}
+
+                                </div>
+
+
+                                <div class="ai-generated-question">
+
+                                    ${
+                                        escapeHTML(
+                                            card.question
+                                        )
+                                    }
+
+                                </div>
+
+
+                                <div class="ai-generated-answer">
+
+                                    ${
+                                        escapeHTML(
+                                            card.answer
+                                        )
+                                    }
+
+                                </div>
+
+
+                                <button
+                                    class="ai-remove-button"
+                                    data-ai-remove="${index}"
+                                >
+                                    Удалить эту карточку
+                                </button>
+
+                            </div>
+
+                        `;
+
+                    }
+                )
+                .join("")
+        }
+
+
+        <div class="ai-actions">
+
+            <button
+                class="button"
+                id="saveAICardsButton"
+            >
+                + Добавить все в Recall
+            </button>
+
+
+            <button
+                class="button secondary"
+                id="regenerateAICardsButton"
+            >
+                ↻ Создать заново
+            </button>
+
+        </div>
+
+    `;
+
+
+    document
+        .querySelectorAll(
+            "[data-ai-remove]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const index =
+                        Number(
+                            button.dataset
+                                .aiRemove
+                        );
+
+
+                    generatedAICards.splice(
+                        index,
+                        1
+                    );
+
+
+                    renderAICardsPreview();
+
+                }
+            );
+
+        });
+
+
+    document
+        .getElementById(
+            "saveAICardsButton"
+        )
+        .addEventListener(
+            "click",
+            saveGeneratedAICards
+        );
+
+
+    document
+        .getElementById(
+            "regenerateAICardsButton"
+        )
+        .addEventListener(
+            "click",
+            generateAICards
+        );
+
+}
+
+
+
+/* =========================================================
+   SAVE AI CARDS
+========================================================= */
+
+function saveGeneratedAICards() {
+
+    if (
+        generatedAICards.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    const subject =
+        document
+            .getElementById(
+                "aiSubjectInput"
+            )
+            .value
+            .trim() ||
+        "Без предмета";
+
+
+    const title =
+        document
+            .getElementById(
+                "aiTitleInput"
+            )
+            .value
+            .trim() ||
+        "AI-конспект";
+
+
+    const page =
+        document
+            .getElementById(
+                "aiPageInput"
+            )
+            .value
+            .trim();
+
+
+    const examDate =
+        document
+            .getElementById(
+                "aiExamInput"
+            )
+            .value ||
+        null;
+
+
+    generatedAICards.forEach(
+        (aiCard, index) => {
+
+            const id =
+                Date.now() +
+                index;
+
+
+            const card = {
+
+                id,
+
+                subject,
+
+                title,
+
+                page,
+
+                examDate,
+
+                question:
+                    aiCard.question.trim(),
+
+                answer:
+                    aiCard.answer.trim(),
+
+                interval: 0,
+
+                stability: 1,
+
+                repetitions: 0,
+
+                reviews: 0,
+
+                correctReviews: 0,
+
+                due:
+                    new Date()
+                        .toISOString(),
+
+                createdAt:
+                    new Date()
+                        .toISOString(),
+
+                source:
+                    "ai"
+
+            };
+
+
+            data.cards.push(
+                card
+            );
+
+
+            addCardToToday(
+                id
+            );
+
+        }
+    );
+
+
+    saveData();
+
+
+    const count =
+        generatedAICards.length;
+
+
+    generatedAICards =
+        [];
+
+
+    document.getElementById(
+        "aiNotesInput"
+    ).value = "";
+
+
+    document.getElementById(
+        "aiCardsPreview"
+    ).innerHTML = "";
+
+
+    document.getElementById(
+        "aiStatus"
+    ).className =
+        "ai-status success";
+
+
+    document.getElementById(
+        "aiStatus"
+    ).textContent =
+        `✓ ${count} карточек добавлено в Recall`;
+
+
+    updateEverything();
+
+}
 
 /* =========================================================
    START APP
