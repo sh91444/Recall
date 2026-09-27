@@ -930,4 +930,145 @@ textarea {
     .delete-btn {
         width: 100%;
     }
+}/* =========================================================
+   AI
+========================================================= */
+
+.ai-panel {
+    position: relative;
+    overflow: hidden;
+}
+
+
+.ai-panel::after {
+    content: "";
+
+    position: absolute;
+
+    width: 220px;
+    height: 220px;
+
+    right: -100px;
+    top: -120px;
+
+    background: rgba(100, 103, 242, 0.18);
+
+    filter: blur(60px);
+
+    border-radius: 50%;
+
+    pointer-events: none;
+}
+
+
+.ai-notes {
+    min-height: 180px;
+}
+
+
+.ai-status {
+    min-height: 20px;
+
+    font-size: 13px;
+
+    color: var(--muted);
+}
+
+
+.ai-status.loading {
+    color: #aaaaff;
+}
+
+
+.ai-status.success {
+    color: var(--green);
+}
+
+
+.ai-status.error {
+    color: #f87171;
+}
+
+
+.ai-preview {
+    display: grid;
+
+    gap: 12px;
+}
+
+
+.ai-generated-card {
+    padding: 16px;
+
+    background: var(--surface2);
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+}
+
+
+.ai-generated-number {
+    margin-bottom: 8px;
+
+    color: #aaaaff;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+.ai-generated-question {
+    margin-bottom: 9px;
+
+    font-weight: 700;
+
+    line-height: 1.45;
+}
+
+
+.ai-generated-answer {
+    color: var(--muted);
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+.ai-actions {
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 5px;
+}
+
+
+.ai-actions button {
+    flex: 1;
+}
+
+
+.ai-remove-button {
+    margin-top: 12px;
+
+    padding: 6px 10px;
+
+    background: transparent;
+
+    color: #f87171;
+
+    border: 1px solid #4b2025;
+
+    border-radius: 8px;
+}
+
+
+@media (max-width: 600px) {
+
+    .ai-actions {
+        flex-direction: column;
+    }
+
 }
