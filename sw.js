@@ -1,5 +1,5 @@
 const CACHE_NAME =
-    "recall-v2";
+    "recall-v6";
 
 
 const FILES_TO_CACHE = [
